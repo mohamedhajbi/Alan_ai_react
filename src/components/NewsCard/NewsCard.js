@@ -1,13 +1,26 @@
-import React from 'react';
-
+import React, { useState, useEffect, createRef } from 'react'; 
+import classNames from 'classnames';
 import { Card, CardActions, CardActionArea, CardContent, CardMedia, Button, Typography } from '@material-ui/core';
 
 import useStyles from './style.js';
 
-export default function NewsCard({ article: { description, publishedAt, source, title, url, urlToImage }, i }) {
+export default function NewsCard({ article: { description, publishedAt, source, title, url, urlToImage }, i,  activeArticle }) {
     const classes = useStyles();
+    const [elRefs, setElRefs] = useState([]);//we have to create ref for evrey card
+    const scrollToRef = (ref) => window.scroll(0, ref.current.offsetTop - 50);
+    useEffect(() => { // called only on the start to setup all the refs
+        setElRefs((refs) => Array(20).fill().map((_, j) => refs[j] || createRef(j)))
+    }, []);
+
+    useEffect(() => { // called evrey time activeArticle or elrefs changed
+        if(i === activeArticle && elRefs[activeArticle]){
+            scrollToRef(elRefs[activeArticle]);
+        }
+    }, [i, activeArticle, elRefs]);    
+
+
     return (
-        <Card className={classes.card}>
+        <Card ref={elRefs[i]} className={classNames(classes.card, activeArticle === i ? classes.activeCard : null)}>
 
             <CardActionArea href={url} target='_blank'> {/* the clickable part of the card :: _blank for open in another page */}
                 <CardMedia
