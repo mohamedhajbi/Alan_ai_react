@@ -9,7 +9,9 @@
 //     p.play({command : 'testCommand'});
 // });
 
-const API_KEY = '';
+const API_KEY = '7bdfb1b10aca41c6becea47611b7c35a';
+const CHATGPT_API_KEY = 'sk-proj-r1fr1WFyafa0CF0HoMaAT3BlbkFJuxo6351Cs1Ei0KsVbOUK'; // Your ChatGPT API key
+
 let savedArticles = [];
 
 // News by Source
@@ -35,8 +37,6 @@ intent('(Give|) (me|) (the|) news from $(source* (.*))', (p) => {
         p.play(`Here are the (latest|recent) ${p.source.value}.`);
         p.play('would you like me to raed the headlines?');
         p.then(confirmation);
-      
-
     });
 })
     
@@ -127,6 +127,43 @@ intent('(go|) back', (p) => {
     p.play('okito, easy peasy');
     p.play({ command: 'newHeadlines', articles:[] })
 })
+
+//////////////
+
+
+intent('(Ask|) ChatGPT about $(query* (.*))', async (p) => {
+    try {
+        const response = await getChatGPTResponse(p.query.value);
+        p.play({ command: 'text', text: response });
+    } catch (error) {
+        console.error('ChatGPT API Error:', error);
+        p.play('Sorry, I encountered an error while processing your request.');
+    }
+});
+
+const getChatGPTResponse = async (query) => {
+    const API_URL = 'https://api.openai.com/v1/engines/text-davinci-003/completions';
+    const headers = {
+        'Authorization': `Bearer ${CHATGPT_API_KEY}`, // Use your ChatGPT API key here
+        'Content-Type': 'application/json'
+    };
+    const data = {
+        prompt: query,
+        max_tokens: 150,
+        temperature: 0.7
+    };
+
+    const response = await api.request({
+        url: API_URL,
+        method: 'POST',
+        headers,
+        body: JSON.stringify(data)
+    });
+
+    return response.choices[0].text.trim();
+};
+
+
 
 
 // Give your AI assistant some knowledge about the world
