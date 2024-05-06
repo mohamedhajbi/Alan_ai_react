@@ -28,9 +28,9 @@ intent('(Ask|) Gemini about $(query* (.*))', async (p, { query }) => {
       body: JSON.stringify(data),
       
     });
-
+    console.log("aaaaaaaaaaa",response)
     const completionText = response.results[0].completion_text.trim();
-    console.log(data)
+    
     console.log("aaaaaaaaaaaaaaaaaaaaaaa")
     console.log(completionText)
     p.play({ command: 'text', text: completionText });
